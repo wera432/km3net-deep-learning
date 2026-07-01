@@ -1,0 +1,12 @@
+torch
+torchvision
+torchaudio
+torch-geometric
+pandas
+numpy
+scikit-learn
+matplotlib
+tensorboard
+pyyaml
+h5py
+tqdm
