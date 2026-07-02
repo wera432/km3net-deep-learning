@@ -1,0 +1,52 @@
+seed: 42
+deterministic: true
+device: auto
+data:
+  data_dir: data/
+  file_pattern: '*.h5'
+  hdf_key: null
+  dropna: true
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+  batch_size: 256
+  num_workers: 4
+graph:
+  k: 8
+  symmetric: true
+  num_neighbors:
+  - 15
+  - 10
+  - 5
+train:
+  optimizer: adamw
+  lr: 0.001
+  weight_decay: 0.0001
+  momentum: 0.9
+  epochs: 150
+  grad_clip: 5.0
+  scheduler:
+    type: plateau
+    factor: 0.5
+    patience: 8
+    step_size: 30
+    gamma: 0.1
+    t_max: 150
+  early_stopping:
+    enabled: true
+    patience: 20
+    min_delta: 0.0001
+loss:
+  type: cosine_mse
+  lambda: 0.5
+  eps: 1.0e-08
+  normalize_mse: false
+logging:
+  runs_dir: runs
+  checkpoints_dir: checkpoints
+model:
+  name: mlp
+  hidden_dim: 256
+  num_layers: 4
+  dropout: 0.2
+  activation: relu

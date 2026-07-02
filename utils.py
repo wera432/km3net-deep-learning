@@ -34,7 +34,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import torch
@@ -180,25 +180,104 @@ def load_experiment_config(base_path: PathLike, model_path: PathLike) -> Dict[st
     return merge_configs(base_cfg, model_cfg)
 
 
+def save_config(config: Dict[str, Any], path: PathLike) -> None:
+    """Persist a (typically fully-resolved/merged) config dictionary to YAML.
+
+    Used by ``train.py`` to save the effective configuration next to each
+    checkpoint, so a given run's exact hyperparameters are always
+    recoverable later without needing to remember which base/model YAML
+    files (and any CLI overrides) produced it.
+
+    Args:
+        config: The configuration dictionary to save.
+        path: Destination ``.yaml`` path; parent directories are created
+            automatically if missing.
+    """
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w") as f:
+        yaml.safe_dump(config, f, sort_keys=False)
+
+
 def build_run_name(cfg: Dict[str, Any]) -> str:
     """Build a unique, human-readable run identifier from a config.
 
-    The name encodes the model type and a timestamp, e.g.
-    ``gat_20260701-113045``. This name is used both as the TensorBoard run
-    subdirectory (under ``runs/``) and the checkpoint subdirectory (under
-    ``checkpoints/``), so a given experiment's logs and weights are always
-    easy to correlate.
+    The name encodes the model type, an optional hyperparameter tag, and a
+    timestamp, e.g. ``gat_20260701-113045`` or, when ``cfg["run_tag"]`` is
+    set (as done by ``sweep.py`` for each grid combination),
+    ``gat_lr0.001_optimizeradamw_20260701-113045``. This name is used both
+    as the TensorBoard run subdirectory (under ``runs/``) and the
+    checkpoint subdirectory (under ``checkpoints/``), so a given
+    experiment's logs and weights are always easy to correlate -- and, for
+    sweeps, easy to tell apart at a glance.
 
     Args:
         cfg: The effective (merged) experiment configuration. Expects a
-            ``model.name`` key; falls back to ``"model"`` if absent.
+            ``model.name`` key (falls back to ``"model"`` if absent) and an
+            optional top-level ``run_tag`` string.
 
     Returns:
         A filesystem-safe run name string.
     """
     model_name = cfg.get("model", {}).get("name", "model")
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    tag = cfg.get("run_tag")
+    if tag:
+        safe_tag = str(tag).replace(" ", "").replace("/", "-").replace(":", "-")
+        return f"{model_name}_{safe_tag}_{timestamp}"
     return f"{model_name}_{timestamp}"
+
+
+def set_by_dotted_path(config: Dict[str, Any], dotted_key: str, value: Any) -> None:
+    """Set a value in a nested config dict using a dotted key path, in place.
+
+    Intermediate dictionaries are created automatically if they don't yet
+    exist. Used by :func:`apply_overrides` to implement ``--override
+    train.lr=0.0005``-style CLI arguments.
+
+    Args:
+        config: The config dictionary to mutate in place.
+        dotted_key: Dotted path, e.g. ``"train.lr"`` or ``"model.activation"``.
+        value: The value to set at that path.
+    """
+    keys = dotted_key.split(".")
+    node = config
+    for key in keys[:-1]:
+        if key not in node or not isinstance(node[key], dict):
+            node[key] = {}
+        node = node[key]
+    node[keys[-1]] = value
+
+
+def apply_overrides(config: Dict[str, Any], overrides: List[str]) -> Dict[str, Any]:
+    """Apply a list of ``"dotted.key=value"`` CLI-style overrides to a config.
+
+    Values are parsed with YAML's own scalar rules (via ``yaml.safe_load``),
+    so ``"0.001"`` becomes a float, ``"true"`` becomes a bool, ``"adamw"``
+    stays a string, and ``"[1,2,3]"`` becomes a list -- matching how the
+    same value would be written directly in a YAML file. This is what lets
+    ``train.py --override train.optimizer=adamw --override train.lr=0.0005``
+    behave identically to hand-editing those two keys in the YAML.
+
+    Args:
+        config: The base configuration dictionary (not mutated; a deep copy
+            is modified and returned).
+        overrides: A list of strings like ``"train.lr=0.0005"``.
+
+    Returns:
+        A new configuration dictionary with all overrides applied.
+
+    Raises:
+        ValueError: If an override string doesn't contain ``'='``.
+    """
+    cfg = copy.deepcopy(config)
+    for item in overrides:
+        if "=" not in item:
+            raise ValueError(f"Invalid override '{item}', expected format 'dotted.key=value'")
+        dotted_key, raw_value = item.split("=", 1)
+        value = yaml.safe_load(raw_value)
+        set_by_dotted_path(cfg, dotted_key.strip(), value)
+    return cfg
 
 
 # --------------------------------------------------------------------------- #

@@ -1,0 +1,17 @@
+# =============================================================================
+# mlp.yaml
+# =============================================================================
+# MLP baseline. Merged on top of base.yaml -- only the `model:` section
+# differs; data, training procedure, and loss are shared with every other
+# model config.
+#
+# Run with:
+#   python train.py --model-config configs/mlp.yaml
+# =============================================================================
+
+model:
+  name: mlp
+  hidden_dim: 256      # Width of each hidden layer
+  num_layers: 4           # Number of [Linear -> Activation -> Dropout] blocks
+  dropout: 0.2                # Dropout probability
+  activation: relu               # relu | leaky_relu | elu | gelu | tanh | selu

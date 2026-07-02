@@ -1,0 +1,17 @@
+# =============================================================================
+# gcn.yaml
+# =============================================================================
+# Graph Convolutional Network (Kipf & Welling). Merged on top of base.yaml --
+# only the `model:` section differs; data (including graph.k/num_neighbors),
+# training procedure, and loss are shared with every other model config.
+#
+# Run with:
+#   python train.py --model-config configs/gcn.yaml
+# =============================================================================
+
+model:
+  name: gcn
+  hidden_dim: 128     # Width of each GCNConv layer
+  num_layers: 3          # Number of GCNConv layers (should match len(graph.num_neighbors) in base.yaml)
+  dropout: 0.2               # Dropout probability after each hidden activation
+  activation: relu              # relu | leaky_relu | elu | gelu | tanh | selu

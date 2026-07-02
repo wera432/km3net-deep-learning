@@ -29,7 +29,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torch_geometric.loader import NeighborLoader
 
-from losses import DirectionLoss, build_loss
+from loss import DirectionLoss, build_loss
 from utils import (
     AverageMeter,
     EarlyStopping,

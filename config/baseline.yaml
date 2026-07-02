@@ -1,0 +1,73 @@
+# =============================================================================
+# base.yaml
+# =============================================================================
+# Shared configuration for ALL models (MLP, GCN, GraphSAGE, GAT).
+#
+# Everything in this file controls the DATA and TRAINING PROCEDURE, which
+# must be identical across models for a fair comparison. Model-specific
+# configs (configs/mlp.yaml, configs/gcn.yaml, configs/graphsage.yaml,
+# configs/gat.yaml) only ever override the `model:` section below.
+#
+# Loaded and deep-merged with a model config via:
+#   utils.load_experiment_config("configs/base.yaml", "configs/<model>.yaml")
+# =============================================================================
+
+# --- Reproducibility -------------------------------------------------------
+seed: 42                # Global seed: data split, weight init, shuffling, ...
+deterministic: true      # Force deterministic cuDNN algorithms (slower, but reproducible)
+device: auto              # auto | cuda | cpu  ("auto" uses CUDA if available)
+
+# --- Data --------------------------------------------------------------------
+data:
+  data_dir: "data/"        # Directory containing KM3NeT .h5 files
+  file_pattern: "*.h5"       # Glob pattern to select files within data_dir
+  hdf_key: null                # HDF5 key, if files store more than one dataset (usually not needed)
+  dropna: true                   # Drop events with NaNs in any required feature/target column
+
+  train_ratio: 0.70                # Fraction of events used for training
+  val_ratio: 0.15                    # Fraction of events used for validation
+  test_ratio: 0.15                     # Fraction of events used for held-out testing
+
+  batch_size: 256                        # Batch size (same meaning for MLP batches and GNN seed-node batches)
+  num_workers: 4                           # DataLoader worker processes (tabular models only)
+
+# --- Graph construction (used only by GCN / GraphSAGE / GAT) --------------
+graph:
+  k: 8                     # Number of nearest neighbors per node in the k-NN population graph
+  symmetric: true            # Symmetrize the k-NN graph (recommended for GCN/GraphSAGE/GAT)
+  num_neighbors: [15, 10, 5]   # NeighborLoader sampling fan-out per GNN layer (length should match model.num_layers)
+
+# --- Training procedure (identical across all models) ----------------------
+train:
+  optimizer: adamw      # adam | adamw | sgd | rmsprop
+  lr: 0.001                # Initial learning rate
+  weight_decay: 0.0001       # L2 regularization
+  momentum: 0.9                 # Only used when optimizer: sgd
+
+  epochs: 150                      # Maximum number of training epochs
+  grad_clip: 5.0                      # Max gradient norm (set to null to disable)
+
+  scheduler:
+    type: plateau           # none | step | cosine | plateau | exponential
+    factor: 0.5                # plateau: LR multiplier on plateau
+    patience: 8                   # plateau: epochs with no improvement before reducing LR
+    step_size: 30                    # step: epochs between LR drops
+    gamma: 0.1                          # step / exponential: LR multiplier
+    t_max: 150                             # cosine: period (defaults to train.epochs if omitted)
+
+  early_stopping:
+    enabled: true              # Set to false to disable early stopping entirely
+    patience: 20                  # Epochs with no val_loss improvement before stopping
+    min_delta: 0.0001                # Minimum change to count as an improvement
+
+# --- Loss function (identical across all models) ---------------------------
+loss:
+  type: cosine_mse       # cosine | cosine_mse
+  lambda: 0.5               # Weight of the MSE term (only used by cosine_mse)
+  eps: 1.0e-8                  # Numerical stability constant for vector normalization
+  normalize_mse: false            # If true, MSE term uses normalized predictions (magnitude-invariant)
+
+# --- Logging / output locations --------------------------------------------
+logging:
+  runs_dir: "runs"                 # TensorBoard logs: runs/<model>_<timestamp>/
+  checkpoints_dir: "checkpoints"     # Checkpoints + history + config: checkpoints/<model>_<timestamp>/

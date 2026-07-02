@@ -31,6 +31,7 @@ from dataset import NeutrinoDataModule
 from models import build_model
 from trainer import Trainer
 from utils import (
+    apply_overrides,
     build_run_name,
     count_parameters,
     get_device,
@@ -81,6 +82,18 @@ def parse_args() -> argparse.Namespace:
         choices=["cuda", "cpu"],
         help="Override automatic device selection.",
     )
+    parser.add_argument(
+        "--override",
+        action="append",
+        default=[],
+        metavar="KEY=VALUE",
+        help=(
+            "Override any config value using a dotted path, e.g. "
+            "--override train.lr=0.0005 --override model.activation=elu. "
+            "Repeatable. This is what sweep.py uses to run hyperparameter grids "
+            "without hand-editing YAML for every combination."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -106,6 +119,7 @@ def main() -> None:
     """Load config, build the data module / model / trainer, and run training."""
     args = parse_args()
     config = load_experiment_config(args.base_config, args.model_config)
+    config = apply_overrides(config, args.override)
 
     if args.seed is not None:
         config["seed"] = args.seed
@@ -122,6 +136,8 @@ def main() -> None:
     logger = setup_logger(log_file=checkpoint_dir / "train.log")
     logger.info(f"Run name: {run_name}")
     logger.info(f"Base config: {args.base_config} | Model config: {args.model_config}")
+    if args.override:
+        logger.info(f"CLI overrides applied: {args.override}")
 
     save_config(config, checkpoint_dir / "config.yaml")
     logger.info(f"Resolved config saved to {checkpoint_dir / 'config.yaml'}")
