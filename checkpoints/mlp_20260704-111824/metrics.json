@@ -1,0 +1,9 @@
+{
+  "run_name": "mlp_20260704-111824",
+  "model": "mlp",
+  "checkpoint_epoch": 60,
+  "mean_angular_error_deg": 24.913591384887695,
+  "median_angular_error_deg": 16.77375030517578,
+  "std_angular_error_deg": 23.044862747192383,
+  "mean_cosine_similarity": 0.8466816544532776
+}

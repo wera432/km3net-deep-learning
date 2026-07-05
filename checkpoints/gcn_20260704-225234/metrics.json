@@ -1,0 +1,9 @@
+{
+  "run_name": "gcn_20260704-225234",
+  "model": "gcn",
+  "checkpoint_epoch": 55,
+  "mean_angular_error_deg": 27.683242797851562,
+  "median_angular_error_deg": 19.12746810913086,
+  "std_angular_error_deg": 24.450868606567383,
+  "mean_cosine_similarity": 0.821357011795044
+}

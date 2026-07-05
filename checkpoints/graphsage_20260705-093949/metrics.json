@@ -1,0 +1,9 @@
+{
+  "run_name": "graphsage_20260705-093949",
+  "model": "graphsage",
+  "checkpoint_epoch": 71,
+  "mean_angular_error_deg": 24.893800735473633,
+  "median_angular_error_deg": 16.554536819458008,
+  "std_angular_error_deg": 23.304819107055664,
+  "mean_cosine_similarity": 0.845698356628418
+}

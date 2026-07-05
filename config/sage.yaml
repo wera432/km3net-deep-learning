@@ -1,0 +1,17 @@
+# =============================================================================
+# graphsage.yaml
+# =============================================================================
+# GraphSAGE (Hamilton et al.). Merged on top of base.yaml -- only the
+# `model:` section differs; data (including graph.k/num_neighbors), training
+# procedure, and loss are shared with every other model config.
+#
+# Run with:
+#   python train.py --model-config configs/graphsage.yaml
+# =============================================================================
+
+model:
+  name: graphsage
+  hidden_dim: [128, 256]
+  num_layers: 3
+  dropout: [0.1, 0.2, 0.3]
+  activation: leaky_relu

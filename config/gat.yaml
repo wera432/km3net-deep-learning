@@ -1,0 +1,18 @@
+# =============================================================================
+# gat.yaml
+# =============================================================================
+# Graph Attention Network (Velickovic et al.). Merged on top of base.yaml --
+# only the `model:` section differs; data (including graph.k/num_neighbors),
+# training procedure, and loss are shared with every other model config.
+#
+# Run with:
+#   python train.py --model-config configs/gat.yaml
+# =============================================================================
+
+model:
+  name: gat
+  hidden_dim: 256                  # fixed, not gridded -- see note on heads below
+  num_layers: 3
+  dropout: [0.1, 0.2, 0.3]
+  activation: leaky_relu
+  heads: [2, 4, 8]                 # GAT-specific: attention heads per layer

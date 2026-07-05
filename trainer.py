@@ -367,6 +367,8 @@ class Trainer:
         )
 
         epoch = self.start_epoch
+        train_metrics: Optional[Dict[str, float]] = None
+        val_metrics: Optional[Dict[str, float]] = None
         for epoch in range(self.start_epoch, self.epochs):
             timer = EpochTimer()
             with timer:
@@ -398,6 +400,10 @@ class Trainer:
                 )
                 break
 
+        if train_metrics is not None and val_metrics is not None:
+            self._log_hparams(train_metrics, val_metrics)
+        else:
+            self.logger.info("No epochs were run (already at/beyond target epoch count); skipping HParams logging.")
         self.writer.close()
         return {"best_val_loss": self.best_val_loss, "epochs_trained": epoch + 1}
 
@@ -426,6 +432,88 @@ class Trainer:
         for name, value in val_metrics.items():
             if name not in ("loss", "cosine_similarity"):
                 self.writer.add_scalar(f"LossComponents/val_{name}", value, epoch)
+
+    def _collect_hparams(self) -> Dict[str, Union[int, float, str, bool]]:
+        """Flatten the relevant hyperparameters of this run into a scalar-only dict.
+
+        Only primitive types (``int``, ``float``, ``str``, ``bool``) are
+        included -- these are exactly the types
+        ``SummaryWriter.add_hparams`` accepts. Nested config sections that
+        matter for comparing configurations (model architecture, optimizer,
+        scheduler, loss) are flattened to a single dotted level; anything
+        not representable as a primitive (e.g. ``None``, lists) is coerced
+        to its string form rather than dropped, so it still shows up in the
+        TensorBoard HParams table for reference.
+
+        Returns:
+            A flat dict suitable for the ``hparam_dict`` argument of
+            :meth:`torch.utils.tensorboard.SummaryWriter.add_hparams`.
+        """
+        model_cfg = self.config.get("model", {}) or {}
+        data_cfg = self.config.get("data", {}) or {}
+        loss_cfg = self.config.get("loss", {}) or {}
+        sched_cfg = self.train_cfg.get("scheduler", {}) or {}
+
+        def scalarize(value: Any) -> Union[int, float, str, bool]:
+            if isinstance(value, (int, float, str, bool)):
+                return value
+            return str(value)
+
+        hparams: Dict[str, Union[int, float, str, bool]] = {
+            "model": scalarize(model_cfg.get("name", "")),
+            "optimizer": scalarize(self.train_cfg.get("optimizer", "")),
+            "lr": scalarize(self.train_cfg.get("lr", -1.0)),
+            "weight_decay": scalarize(self.train_cfg.get("weight_decay", -1.0)),
+            "batch_size": scalarize(data_cfg.get("batch_size", -1)),
+            "scheduler": scalarize(sched_cfg.get("type", "none")),
+            "loss_type": scalarize(loss_cfg.get("type", "")),
+            "loss_lambda": scalarize(loss_cfg.get("lambda", -1.0)),
+            "seed": scalarize(self.config.get("seed", -1)),
+        }
+        # Every model.* field (hidden_dim, num_layers, dropout, activation,
+        # and any architecture-specific extras such as GAT's `heads`) is
+        # included generically, so new architectures need no changes here.
+        for key, value in model_cfg.items():
+            hparams[f"model_{key}"] = scalarize(value)
+
+        return hparams
+
+    def _log_hparams(self, train_metrics: Dict[str, float], val_metrics: Dict[str, float]) -> None:
+        """Write this run's hyperparameters + final metrics to TensorBoard's HParams tab.
+
+        Writing with ``run_name="."`` keeps the hparams event file in the
+        *same* log directory as the scalar curves already written by
+        :meth:`_log_tensorboard`, rather than spawning a separate
+        TensorBoard "run" entry. This matters when several configurations
+        (e.g. an inline grid from ``train.py``) are logged underneath one
+        shared group directory: pointing TensorBoard at that group
+        directory then shows every configuration both as overlaid curves
+        in the Scalars tab and as a sortable/filterable table (and
+        parallel-coordinates view) in the HParams tab -- one place to see
+        how every configuration performed.
+
+        Failures here are logged and swallowed rather than raised, since
+        losing the HParams summary should never fail an otherwise-complete
+        training run.
+        """
+        hparams = self._collect_hparams()
+        metrics = {
+            "hparam/best_val_loss": self.best_val_loss,
+            "hparam/final_val_loss": val_metrics["loss"],
+            "hparam/final_val_cosine_similarity": val_metrics["cosine_similarity"],
+            "hparam/final_train_loss": train_metrics["loss"],
+        }
+        try:
+            self.writer.add_hparams(hparams, metrics, run_name=".")
+        except TypeError:
+            # Older torch versions without the `run_name` kwarg: falls back
+            # to the default behavior of a nested subdirectory per call.
+            try:
+                self.writer.add_hparams(hparams, metrics)
+            except Exception as exc:  # noqa: BLE001 - never fail training over TB logging
+                self.logger.warning(f"Failed to log hparams to TensorBoard: {exc}")
+        except Exception as exc:  # noqa: BLE001 - never fail training over TB logging
+            self.logger.warning(f"Failed to log hparams to TensorBoard: {exc}")
 
     def _log_console(
         self,

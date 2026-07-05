@@ -1,0 +1,9 @@
+{
+  "run_name": "gat_20260705-101138",
+  "model": "gat",
+  "checkpoint_epoch": 61,
+  "mean_angular_error_deg": 27.352222442626953,
+  "median_angular_error_deg": 18.91539192199707,
+  "std_angular_error_deg": 24.290311813354492,
+  "mean_cosine_similarity": 0.8243263363838196
+}

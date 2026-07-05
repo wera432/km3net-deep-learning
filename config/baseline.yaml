@@ -44,7 +44,7 @@ train:
   weight_decay: 0.0001       # L2 regularization
   momentum: 0.9                 # Only used when optimizer: sgd
 
-  epochs: 150                      # Maximum number of training epochs
+  epochs: 50                      # Maximum number of training epochs
   grad_clip: 5.0                      # Max gradient norm (set to null to disable)
 
   scheduler:

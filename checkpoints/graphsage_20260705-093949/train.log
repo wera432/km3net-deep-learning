@@ -1,0 +1,82 @@
+[2026-07-05 09:39:49] INFO - graphsage_20260705-093949 - [1/1] Run name: graphsage_20260705-093949
+[2026-07-05 09:39:49] INFO - graphsage_20260705-093949 - [1/1] Model: GraphSAGE | requires_graph=True | trainable_params=70,915 | model_config={'name': 'graphsage', 'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1, 'activation': 'leaky_relu'}
+[2026-07-05 09:41:48] INFO - graphsage_20260705-093949 - Trainer ready: model=GraphSAGE (70,915 trainable params), device=cuda, graph_model=True
+[2026-07-05 09:41:48] INFO - graphsage_20260705-093949 - Starting training: epochs=75, start_epoch=0, optimizer=AdamW, scheduler=plateau
+[2026-07-05 09:42:12] INFO - graphsage_20260705-093949 - Epoch 1/75 | train_loss=0.23858 val_loss=0.22542 | train_cos=0.8166 val_cos=0.8253 | lr=1.00e-03 | time=23.9s
+[2026-07-05 09:42:36] INFO - graphsage_20260705-093949 - Epoch 2/75 | train_loss=0.22350 val_loss=0.22034 | train_cos=0.8273 val_cos=0.8290 | lr=1.00e-03 | time=24.1s
+[2026-07-05 09:43:00] INFO - graphsage_20260705-093949 - Epoch 3/75 | train_loss=0.22028 val_loss=0.21956 | train_cos=0.8297 val_cos=0.8295 | lr=1.00e-03 | time=23.8s
+[2026-07-05 09:43:23] INFO - graphsage_20260705-093949 - Epoch 4/75 | train_loss=0.21857 val_loss=0.21630 | train_cos=0.8309 val_cos=0.8321 | lr=1.00e-03 | time=23.3s
+[2026-07-05 09:43:47] INFO - graphsage_20260705-093949 - Epoch 5/75 | train_loss=0.21750 val_loss=0.21767 | train_cos=0.8317 val_cos=0.8310 | lr=1.00e-03 | time=23.6s
+[2026-07-05 09:44:11] INFO - graphsage_20260705-093949 - Epoch 6/75 | train_loss=0.21591 val_loss=0.21418 | train_cos=0.8329 val_cos=0.8337 | lr=1.00e-03 | time=23.7s
+[2026-07-05 09:44:34] INFO - graphsage_20260705-093949 - Epoch 7/75 | train_loss=0.21490 val_loss=0.21291 | train_cos=0.8336 val_cos=0.8347 | lr=1.00e-03 | time=23.1s
+[2026-07-05 09:44:57] INFO - graphsage_20260705-093949 - Epoch 8/75 | train_loss=0.21417 val_loss=0.21206 | train_cos=0.8342 val_cos=0.8350 | lr=1.00e-03 | time=23.1s
+[2026-07-05 09:45:20] INFO - graphsage_20260705-093949 - Epoch 9/75 | train_loss=0.21289 val_loss=0.21148 | train_cos=0.8351 val_cos=0.8356 | lr=1.00e-03 | time=23.3s
+[2026-07-05 09:45:43] INFO - graphsage_20260705-093949 - Epoch 10/75 | train_loss=0.21247 val_loss=0.21104 | train_cos=0.8354 val_cos=0.8358 | lr=1.00e-03 | time=22.8s
+[2026-07-05 09:46:06] INFO - graphsage_20260705-093949 - Epoch 11/75 | train_loss=0.21160 val_loss=0.20900 | train_cos=0.8360 val_cos=0.8373 | lr=1.00e-03 | time=23.1s
+[2026-07-05 09:46:30] INFO - graphsage_20260705-093949 - Epoch 12/75 | train_loss=0.21100 val_loss=0.20941 | train_cos=0.8365 val_cos=0.8371 | lr=1.00e-03 | time=23.3s
+[2026-07-05 09:46:53] INFO - graphsage_20260705-093949 - Epoch 13/75 | train_loss=0.21004 val_loss=0.20897 | train_cos=0.8372 val_cos=0.8374 | lr=1.00e-03 | time=23.5s
+[2026-07-05 09:47:18] INFO - graphsage_20260705-093949 - Epoch 14/75 | train_loss=0.20970 val_loss=0.20940 | train_cos=0.8375 val_cos=0.8370 | lr=1.00e-03 | time=24.4s
+[2026-07-05 09:47:42] INFO - graphsage_20260705-093949 - Epoch 15/75 | train_loss=0.20871 val_loss=0.20680 | train_cos=0.8382 val_cos=0.8390 | lr=1.00e-03 | time=24.1s
+[2026-07-05 09:48:07] INFO - graphsage_20260705-093949 - Epoch 16/75 | train_loss=0.20847 val_loss=0.20771 | train_cos=0.8384 val_cos=0.8383 | lr=1.00e-03 | time=24.8s
+[2026-07-05 09:48:31] INFO - graphsage_20260705-093949 - Epoch 17/75 | train_loss=0.20820 val_loss=0.20675 | train_cos=0.8387 val_cos=0.8390 | lr=1.00e-03 | time=23.9s
+[2026-07-05 09:48:54] INFO - graphsage_20260705-093949 - Epoch 18/75 | train_loss=0.20752 val_loss=0.20685 | train_cos=0.8392 val_cos=0.8390 | lr=1.00e-03 | time=23.3s
+[2026-07-05 09:49:17] INFO - graphsage_20260705-093949 - Epoch 19/75 | train_loss=0.20725 val_loss=0.20722 | train_cos=0.8394 val_cos=0.8386 | lr=1.00e-03 | time=23.3s
+[2026-07-05 09:49:41] INFO - graphsage_20260705-093949 - Epoch 20/75 | train_loss=0.20624 val_loss=0.20695 | train_cos=0.8402 val_cos=0.8389 | lr=1.00e-03 | time=23.4s
+[2026-07-05 09:50:04] INFO - graphsage_20260705-093949 - Epoch 21/75 | train_loss=0.20597 val_loss=0.20583 | train_cos=0.8405 val_cos=0.8398 | lr=1.00e-03 | time=22.8s
+[2026-07-05 09:50:27] INFO - graphsage_20260705-093949 - Epoch 22/75 | train_loss=0.20526 val_loss=0.20692 | train_cos=0.8410 val_cos=0.8390 | lr=1.00e-03 | time=23.2s
+[2026-07-05 09:50:50] INFO - graphsage_20260705-093949 - Epoch 23/75 | train_loss=0.20473 val_loss=0.20654 | train_cos=0.8414 val_cos=0.8392 | lr=1.00e-03 | time=23.1s
+[2026-07-05 09:51:12] INFO - graphsage_20260705-093949 - Epoch 24/75 | train_loss=0.20456 val_loss=0.20511 | train_cos=0.8416 val_cos=0.8403 | lr=1.00e-03 | time=22.5s
+[2026-07-05 09:51:37] INFO - graphsage_20260705-093949 - Epoch 25/75 | train_loss=0.20383 val_loss=0.20464 | train_cos=0.8422 val_cos=0.8408 | lr=1.00e-03 | time=24.8s
+[2026-07-05 09:52:01] INFO - graphsage_20260705-093949 - Epoch 26/75 | train_loss=0.20350 val_loss=0.20486 | train_cos=0.8424 val_cos=0.8406 | lr=1.00e-03 | time=24.2s
+[2026-07-05 09:52:24] INFO - graphsage_20260705-093949 - Epoch 27/75 | train_loss=0.20322 val_loss=0.20389 | train_cos=0.8426 val_cos=0.8413 | lr=1.00e-03 | time=23.0s
+[2026-07-05 09:52:48] INFO - graphsage_20260705-093949 - Epoch 28/75 | train_loss=0.20260 val_loss=0.20482 | train_cos=0.8432 val_cos=0.8407 | lr=1.00e-03 | time=23.9s
+[2026-07-05 09:53:13] INFO - graphsage_20260705-093949 - Epoch 29/75 | train_loss=0.20245 val_loss=0.20390 | train_cos=0.8433 val_cos=0.8413 | lr=1.00e-03 | time=24.3s
+[2026-07-05 09:53:37] INFO - graphsage_20260705-093949 - Epoch 30/75 | train_loss=0.20167 val_loss=0.20409 | train_cos=0.8439 val_cos=0.8413 | lr=1.00e-03 | time=24.5s
+[2026-07-05 09:54:00] INFO - graphsage_20260705-093949 - Epoch 31/75 | train_loss=0.20162 val_loss=0.20432 | train_cos=0.8440 val_cos=0.8411 | lr=1.00e-03 | time=22.6s
+[2026-07-05 09:54:23] INFO - graphsage_20260705-093949 - Epoch 32/75 | train_loss=0.20116 val_loss=0.20460 | train_cos=0.8443 val_cos=0.8410 | lr=1.00e-03 | time=23.1s
+[2026-07-05 09:54:46] INFO - graphsage_20260705-093949 - Epoch 33/75 | train_loss=0.20101 val_loss=0.20429 | train_cos=0.8445 val_cos=0.8410 | lr=1.00e-03 | time=23.2s
+[2026-07-05 09:55:09] INFO - graphsage_20260705-093949 - Epoch 34/75 | train_loss=0.20058 val_loss=0.20379 | train_cos=0.8448 val_cos=0.8415 | lr=1.00e-03 | time=22.5s
+[2026-07-05 09:55:32] INFO - graphsage_20260705-093949 - Epoch 35/75 | train_loss=0.19992 val_loss=0.20316 | train_cos=0.8453 val_cos=0.8419 | lr=1.00e-03 | time=23.1s
+[2026-07-05 09:55:56] INFO - graphsage_20260705-093949 - Epoch 36/75 | train_loss=0.19991 val_loss=0.20324 | train_cos=0.8454 val_cos=0.8420 | lr=1.00e-03 | time=23.8s
+[2026-07-05 09:56:19] INFO - graphsage_20260705-093949 - Epoch 37/75 | train_loss=0.19935 val_loss=0.20424 | train_cos=0.8458 val_cos=0.8412 | lr=1.00e-03 | time=23.2s
+[2026-07-05 09:56:42] INFO - graphsage_20260705-093949 - Epoch 38/75 | train_loss=0.19943 val_loss=0.20327 | train_cos=0.8458 val_cos=0.8420 | lr=1.00e-03 | time=23.2s
+[2026-07-05 09:57:06] INFO - graphsage_20260705-093949 - Epoch 39/75 | train_loss=0.19886 val_loss=0.20254 | train_cos=0.8463 val_cos=0.8424 | lr=1.00e-03 | time=23.3s
+[2026-07-05 09:57:28] INFO - graphsage_20260705-093949 - Epoch 40/75 | train_loss=0.19878 val_loss=0.20304 | train_cos=0.8464 val_cos=0.8420 | lr=1.00e-03 | time=22.5s
+[2026-07-05 09:57:52] INFO - graphsage_20260705-093949 - Epoch 41/75 | train_loss=0.19855 val_loss=0.20294 | train_cos=0.8466 val_cos=0.8421 | lr=1.00e-03 | time=23.3s
+[2026-07-05 09:58:15] INFO - graphsage_20260705-093949 - Epoch 42/75 | train_loss=0.19836 val_loss=0.20187 | train_cos=0.8467 val_cos=0.8430 | lr=1.00e-03 | time=23.3s
+[2026-07-05 09:58:37] INFO - graphsage_20260705-093949 - Epoch 43/75 | train_loss=0.19764 val_loss=0.20239 | train_cos=0.8473 val_cos=0.8426 | lr=1.00e-03 | time=22.6s
+[2026-07-05 09:59:01] INFO - graphsage_20260705-093949 - Epoch 44/75 | train_loss=0.19737 val_loss=0.20199 | train_cos=0.8475 val_cos=0.8430 | lr=1.00e-03 | time=23.1s
+[2026-07-05 09:59:24] INFO - graphsage_20260705-093949 - Epoch 45/75 | train_loss=0.19704 val_loss=0.20255 | train_cos=0.8479 val_cos=0.8424 | lr=1.00e-03 | time=23.1s
+[2026-07-05 09:59:46] INFO - graphsage_20260705-093949 - Epoch 46/75 | train_loss=0.19692 val_loss=0.20277 | train_cos=0.8479 val_cos=0.8422 | lr=1.00e-03 | time=22.7s
+[2026-07-05 10:00:10] INFO - graphsage_20260705-093949 - Epoch 47/75 | train_loss=0.19667 val_loss=0.20323 | train_cos=0.8481 val_cos=0.8418 | lr=1.00e-03 | time=23.2s
+[2026-07-05 10:00:33] INFO - graphsage_20260705-093949 - Epoch 48/75 | train_loss=0.19626 val_loss=0.20247 | train_cos=0.8485 val_cos=0.8425 | lr=1.00e-03 | time=23.2s
+[2026-07-05 10:00:56] INFO - graphsage_20260705-093949 - Epoch 49/75 | train_loss=0.19594 val_loss=0.20380 | train_cos=0.8488 val_cos=0.8416 | lr=1.00e-03 | time=22.6s
+[2026-07-05 10:01:19] INFO - graphsage_20260705-093949 - Epoch 50/75 | train_loss=0.19629 val_loss=0.20244 | train_cos=0.8485 val_cos=0.8424 | lr=1.00e-03 | time=23.2s
+[2026-07-05 10:01:42] INFO - graphsage_20260705-093949 - Epoch 51/75 | train_loss=0.19542 val_loss=0.20134 | train_cos=0.8492 val_cos=0.8435 | lr=1.00e-03 | time=23.3s
+[2026-07-05 10:02:05] INFO - graphsage_20260705-093949 - Epoch 52/75 | train_loss=0.19501 val_loss=0.20172 | train_cos=0.8495 val_cos=0.8431 | lr=1.00e-03 | time=22.7s
+[2026-07-05 10:02:28] INFO - graphsage_20260705-093949 - Epoch 53/75 | train_loss=0.19553 val_loss=0.20180 | train_cos=0.8492 val_cos=0.8431 | lr=1.00e-03 | time=23.1s
+[2026-07-05 10:02:51] INFO - graphsage_20260705-093949 - Epoch 54/75 | train_loss=0.19508 val_loss=0.20140 | train_cos=0.8495 val_cos=0.8435 | lr=1.00e-03 | time=23.4s
+[2026-07-05 10:03:15] INFO - graphsage_20260705-093949 - Epoch 55/75 | train_loss=0.19438 val_loss=0.20149 | train_cos=0.8501 val_cos=0.8432 | lr=1.00e-03 | time=23.4s
+[2026-07-05 10:03:39] INFO - graphsage_20260705-093949 - Epoch 56/75 | train_loss=0.19394 val_loss=0.20173 | train_cos=0.8505 val_cos=0.8432 | lr=1.00e-03 | time=23.8s
+[2026-07-05 10:04:03] INFO - graphsage_20260705-093949 - Epoch 57/75 | train_loss=0.19416 val_loss=0.20196 | train_cos=0.8503 val_cos=0.8430 | lr=1.00e-03 | time=24.6s
+[2026-07-05 10:04:27] INFO - graphsage_20260705-093949 - Epoch 58/75 | train_loss=0.19374 val_loss=0.20195 | train_cos=0.8506 val_cos=0.8430 | lr=1.00e-03 | time=23.9s
+[2026-07-05 10:04:50] INFO - graphsage_20260705-093949 - Epoch 59/75 | train_loss=0.19398 val_loss=0.20210 | train_cos=0.8505 val_cos=0.8431 | lr=1.00e-03 | time=23.0s
+[2026-07-05 10:05:14] INFO - graphsage_20260705-093949 - Epoch 60/75 | train_loss=0.19320 val_loss=0.20191 | train_cos=0.8512 val_cos=0.8430 | lr=1.00e-03 | time=24.1s
+[2026-07-05 10:05:39] INFO - graphsage_20260705-093949 - Epoch 61/75 | train_loss=0.18920 val_loss=0.20021 | train_cos=0.8543 val_cos=0.8442 | lr=5.00e-04 | time=24.8s
+[2026-07-05 10:06:04] INFO - graphsage_20260705-093949 - Epoch 62/75 | train_loss=0.18875 val_loss=0.20035 | train_cos=0.8547 val_cos=0.8441 | lr=5.00e-04 | time=24.9s
+[2026-07-05 10:06:29] INFO - graphsage_20260705-093949 - Epoch 63/75 | train_loss=0.18797 val_loss=0.20032 | train_cos=0.8553 val_cos=0.8443 | lr=5.00e-04 | time=24.3s
+[2026-07-05 10:06:53] INFO - graphsage_20260705-093949 - Epoch 64/75 | train_loss=0.18769 val_loss=0.20082 | train_cos=0.8556 val_cos=0.8438 | lr=5.00e-04 | time=24.3s
+[2026-07-05 10:07:17] INFO - graphsage_20260705-093949 - Epoch 65/75 | train_loss=0.18771 val_loss=0.20040 | train_cos=0.8556 val_cos=0.8442 | lr=5.00e-04 | time=24.4s
+[2026-07-05 10:07:42] INFO - graphsage_20260705-093949 - Epoch 66/75 | train_loss=0.18743 val_loss=0.20081 | train_cos=0.8558 val_cos=0.8438 | lr=5.00e-04 | time=24.6s
+[2026-07-05 10:08:07] INFO - graphsage_20260705-093949 - Epoch 67/75 | train_loss=0.18715 val_loss=0.20065 | train_cos=0.8561 val_cos=0.8439 | lr=5.00e-04 | time=24.7s
+[2026-07-05 10:08:31] INFO - graphsage_20260705-093949 - Epoch 68/75 | train_loss=0.18693 val_loss=0.20061 | train_cos=0.8563 val_cos=0.8441 | lr=5.00e-04 | time=24.1s
+[2026-07-05 10:08:56] INFO - graphsage_20260705-093949 - Epoch 69/75 | train_loss=0.18639 val_loss=0.20087 | train_cos=0.8567 val_cos=0.8438 | lr=5.00e-04 | time=24.6s
+[2026-07-05 10:09:20] INFO - graphsage_20260705-093949 - Epoch 70/75 | train_loss=0.18630 val_loss=0.20021 | train_cos=0.8568 val_cos=0.8443 | lr=5.00e-04 | time=24.6s
+[2026-07-05 10:09:45] INFO - graphsage_20260705-093949 - Epoch 71/75 | train_loss=0.18441 val_loss=0.19980 | train_cos=0.8583 val_cos=0.8446 | lr=2.50e-04 | time=24.8s
+[2026-07-05 10:10:10] INFO - graphsage_20260705-093949 - Epoch 72/75 | train_loss=0.18398 val_loss=0.19966 | train_cos=0.8587 val_cos=0.8447 | lr=2.50e-04 | time=24.6s
+[2026-07-05 10:10:34] INFO - graphsage_20260705-093949 - Epoch 73/75 | train_loss=0.18380 val_loss=0.19979 | train_cos=0.8588 val_cos=0.8445 | lr=2.50e-04 | time=24.2s
+[2026-07-05 10:10:59] INFO - graphsage_20260705-093949 - Epoch 74/75 | train_loss=0.18304 val_loss=0.19990 | train_cos=0.8595 val_cos=0.8445 | lr=2.50e-04 | time=24.6s
+[2026-07-05 10:11:23] INFO - graphsage_20260705-093949 - Epoch 75/75 | train_loss=0.18342 val_loss=0.19988 | train_cos=0.8592 val_cos=0.8445 | lr=2.50e-04 | time=24.6s
+[2026-07-05 10:11:23] INFO - graphsage_20260705-093949 - [1/1] Training complete. Best val loss: 0.19966 after 75 epochs.
+[2026-07-05 10:11:23] INFO - graphsage_20260705-093949 - [1/1] Checkpoints: checkpoints/graphsage_20260705-093949
+[2026-07-05 10:11:23] INFO - graphsage_20260705-093949 - [1/1] Next: python evaluate.py --checkpoint checkpoints/graphsage_20260705-093949/best.pt

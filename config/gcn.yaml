@@ -11,7 +11,7 @@
 
 model:
   name: gcn
-  hidden_dim: 128     # Width of each GCNConv layer
-  num_layers: 3          # Number of GCNConv layers (should match len(graph.num_neighbors) in base.yaml)
-  dropout: 0.2               # Dropout probability after each hidden activation
-  activation: relu              # relu | leaky_relu | elu | gelu | tanh | selu
+  hidden_dim: [128, 256]          # grid
+  num_layers: 3                    # fixed -- see note below on why this isn't a grid axis
+  dropout: [0.1, 0.2, 0.3]        # grid
+  activation: leaky_relu           # fixed, carried over from the MLP winner

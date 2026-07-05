@@ -1,0 +1,10 @@
+runs/
+checkpoints/*
+!checkpoints/mlp_20260704-111824/
+!checkpoints/gcn_20260704-225234/
+!checkpoints/graphsage_20260705-093949/
+!checkpoints/gat_20260705-101138/
+data/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

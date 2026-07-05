@@ -45,6 +45,7 @@ graph) -- neighbors are only ever drawn from within the same split.
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -52,6 +53,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 import torch
+from sklearn.model_selection import train_test_split as sk_train_test_split
 from sklearn.neighbors import NearestNeighbors
 from torch.utils.data import DataLoader, TensorDataset
 from torch_geometric.data import Data
@@ -85,29 +87,63 @@ FEATURE_COLUMNS: List[str] = [
 
 TARGET_COLUMNS: List[str] = ["dir_x", "dir_y", "dir_z"]
 
+# Added to every loaded DataFrame (see `infer_particle_type`) to record which
+# source file each event came from. Not a model input -- deliberately kept
+# out of FEATURE_COLUMNS -- but carried through concatenation, splitting, and
+# (optionally) used to stratify the train/val/test split.
+PARTICLE_TYPE_COLUMN: str = "particle_type"
+
 logger = logging.getLogger("neutrino_reco")
 
 
 # --------------------------------------------------------------------------- #
 # Loading
 # --------------------------------------------------------------------------- #
-def load_h5_files(data_dir: PathLike, pattern: str = "*.h5", key: Optional[str] = None) -> pd.DataFrame:
-    """Load and concatenate all HDF5 files in a directory into one DataFrame.
+def infer_particle_type(path: PathLike, regex: Optional[str] = None) -> str:
+    """Infer a short sample/particle-type label from a source filename.
 
-    Each file is expected to contain a single pandas DataFrame (as written by
-    ``DataFrame.to_hdf``). Files are read in sorted filename order for
-    reproducibility, and concatenated along rows.
+    This is what lets every event still be traced back to its source file
+    after multiple files are concatenated into one DataFrame (see
+    :func:`load_h5_files`), and is what :func:`train_val_test_split` can
+    optionally stratify on.
 
     Args:
-        data_dir: Directory containing ``.h5`` files.
-        pattern: Glob pattern used to select files within ``data_dir``.
-        key: Optional HDF5 key to read from each file. If ``None``,
-            ``pandas.read_hdf`` will auto-detect the key, which requires each
-            file to contain exactly one dataset (as stated in the project
-            data format).
+        path: Path to the source ``.h5`` file.
+        regex: Optional regex applied to the file's stem (filename without
+            extension). If the match has a named group ``type``, that
+            group's text is used as the label; otherwise, if the match has
+            any capturing group, the first one is used; if it has none,
+            the whole match is used. If ``regex`` is ``None`` or doesn't
+            match, the full file stem is used as-is. Example: with files
+            named like ``KM3NeT_00000133_numuCC_23.h5``, the regex
+            ``r"_(numuCC|nueCC|anue|atm_muon)_"`` extracts just
+            ``"numuCC"`` instead of the whole filename.
 
     Returns:
-        A single concatenated DataFrame with a reset integer index.
+        A label string identifying which file/sample this event came from.
+    """
+    stem = Path(path).stem
+    if regex:
+        match = re.search(regex, stem)
+        if match:
+            if "type" in match.groupdict():
+                return match.group("type")
+            if match.groups():
+                return match.group(1)
+            return match.group(0)
+    return stem
+def discover_h5_files(data_dir: PathLike, pattern: str = "*.h5") -> List[Path]:
+    """List HDF5 files in a directory matching a glob pattern, in sorted order.
+
+    Sorted order gives reproducible, deterministic file ordering across runs
+    and platforms (directory iteration order is not guaranteed otherwise).
+
+    Args:
+        data_dir: Directory to search.
+        pattern: Glob pattern used to select files within ``data_dir``.
+
+    Returns:
+        A sorted list of matching file paths.
 
     Raises:
         FileNotFoundError: If no files match ``pattern`` in ``data_dir``.
@@ -116,14 +152,86 @@ def load_h5_files(data_dir: PathLike, pattern: str = "*.h5", key: Optional[str] 
     files = sorted(data_dir.glob(pattern))
     if not files:
         raise FileNotFoundError(f"No files matching '{pattern}' found in {data_dir}")
+    return files
 
-    frames = []
-    for file_path in files:
-        df = pd.read_hdf(file_path, key=key) if key is not None else pd.read_hdf(file_path)
-        frames.append(df)
-        logger.info(f"Loaded {len(df)} events from {file_path.name}")
 
+def load_single_h5_file(
+    path: PathLike, key: Optional[str] = None, particle_type_regex: Optional[str] = None
+) -> pd.DataFrame:
+    """Load exactly one HDF5 file into a DataFrame, tagged with its particle type.
+
+    Args:
+        path: Path to a single ``.h5`` file.
+        key: Optional HDF5 key. If ``None``, ``pandas.read_hdf`` auto-detects
+            the key, which requires the file to contain exactly one dataset
+            (as stated in the project data format).
+        particle_type_regex: Passed to :func:`infer_particle_type` to derive
+            the ``particle_type`` column value for every row of this file.
+
+    Returns:
+        The file's contents as a DataFrame, with an added
+        ``particle_type`` column (see :data:`PARTICLE_TYPE_COLUMN`) so
+        provenance survives later concatenation with other files.
+    """
+    path = Path(path)
+    df = pd.read_hdf(path, key=key) if key is not None else pd.read_hdf(path)
+    label = infer_particle_type(path, particle_type_regex)
+    df[PARTICLE_TYPE_COLUMN] = label
+    logger.info(f"Loaded {len(df)} events from {path.name} (particle_type={label!r})")
+    return df
+
+
+def load_h5_files(
+    data_dir: PathLike,
+    pattern: str = "*.h5",
+    key: Optional[str] = None,
+    particle_type_regex: Optional[str] = None,
+) -> pd.DataFrame:
+    """Load and concatenate ALL HDF5 files in a directory into one DataFrame.
+
+    .. warning::
+        Only use this when pooling events across files is physically
+        justified (e.g. multiple files that are genuinely fragments of the
+        same homogeneous run/sample). If your files represent different
+        detector runs, calibration periods, or samples that should **not**
+        be statistically mixed, use per-file mode instead: pass a specific
+        file directly to :class:`NeutrinoDataModule` via its ``data_file``
+        argument (this is what ``train.py`` does by default -- see its
+        ``data.combine_files`` config flag). Combining incompatible files
+        into one train/val/test split can introduce subtle systematic
+        biases that per-file analysis avoids entirely.
+
+    Each file is expected to contain a single pandas DataFrame (as written by
+    ``DataFrame.to_hdf``). Files are read in sorted filename order for
+    reproducibility, and concatenated along rows. Every file is tagged with
+    a ``particle_type`` column (see :func:`infer_particle_type`) **before**
+    concatenation, so even after pooling, every event can still be traced
+    back to its source file -- and, if desired, the train/val/test split
+    can be stratified by it (see ``NeutrinoDataModule``'s
+    ``data.stratify_by_particle_type`` config flag).
+
+    Args:
+        data_dir: Directory containing ``.h5`` files.
+        pattern: Glob pattern used to select files within ``data_dir``.
+        key: Optional HDF5 key to read from each file. If ``None``,
+            ``pandas.read_hdf`` will auto-detect the key, which requires each
+            file to contain exactly one dataset (as stated in the project
+            data format).
+        particle_type_regex: Passed to :func:`infer_particle_type` for every
+            file; see that function for how it's applied.
+
+    Returns:
+        A single concatenated DataFrame with a reset integer index and a
+        ``particle_type`` column.
+
+    Raises:
+        FileNotFoundError: If no files match ``pattern`` in ``data_dir``.
+    """
+    files = discover_h5_files(data_dir, pattern)
+    frames = [load_single_h5_file(f, key=key, particle_type_regex=particle_type_regex) for f in files]
     full_df = pd.concat(frames, axis=0, ignore_index=True)
+    counts = full_df[PARTICLE_TYPE_COLUMN].value_counts().to_dict()
+    logger.info(f"Combined {len(files)} files into {len(full_df)} events. particle_type counts: {counts}")
     return full_df
 
 
@@ -131,7 +239,12 @@ def load_h5_files(data_dir: PathLike, pattern: str = "*.h5", key: Optional[str] 
 # Splitting
 # --------------------------------------------------------------------------- #
 def train_val_test_split(
-    n: int, train_ratio: float, val_ratio: float, test_ratio: float, seed: int
+    n: int,
+    train_ratio: float,
+    val_ratio: float,
+    test_ratio: float,
+    seed: int,
+    stratify_labels: Optional[np.ndarray] = None,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Produce reproducible, non-overlapping train/val/test index arrays.
 
@@ -144,13 +257,25 @@ def train_val_test_split(
             ``numpy.random.Generator`` is used, independent of global RNG
             state, so calling this repeatedly with the same seed always
             yields the same split regardless of other random calls made
-            elsewhere).
+            elsewhere). Also used as sklearn's ``random_state`` in the
+            stratified path, for the same reproducibility guarantee.
+        stratify_labels: Optional per-sample group labels of length ``n``
+            (e.g. ``particle_type``). When given, splitting is done in two
+            stratified stages -- train vs. (val+test), then val vs. test --
+            each preserving every group's proportion, so e.g. a rare
+            sample type can't be accidentally under- or over-represented
+            in validation or test. Falls back to a plain (non-stratified)
+            random split, with a warning, if the rarest group has too few
+            members to be split reliably (fewer than 3 -- sklearn requires
+            at least 2 members per class per split, and this is split
+            twice).
 
     Returns:
         A tuple ``(train_idx, val_idx, test_idx)`` of integer index arrays.
 
     Raises:
-        ValueError: If the ratios do not sum to ~1.0.
+        ValueError: If the ratios do not sum to ~1.0, or if
+            ``stratify_labels`` is given with a length other than ``n``.
     """
     if not np.isclose(train_ratio + val_ratio + test_ratio, 1.0, atol=1e-6):
         raise ValueError(
@@ -158,6 +283,30 @@ def train_val_test_split(
             f"{train_ratio} + {val_ratio} + {test_ratio} = "
             f"{train_ratio + val_ratio + test_ratio}"
         )
+
+    if stratify_labels is not None:
+        labels = np.asarray(stratify_labels)
+        if len(labels) != n:
+            raise ValueError(f"stratify_labels length ({len(labels)}) must match n ({n}).")
+
+        _, group_counts = np.unique(labels, return_counts=True)
+        if group_counts.min() < 3:
+            logger.warning(
+                f"Rarest particle_type group has only {group_counts.min()} event(s) -- too few to "
+                "stratify a train/val/test split reliably (need >= 3). Falling back to a plain "
+                "(non-stratified) random split."
+            )
+        else:
+            all_idx = np.arange(n)
+            train_idx, rest_idx = sk_train_test_split(
+                all_idx, train_size=train_ratio, stratify=labels, random_state=seed
+            )
+            rest_labels = labels[rest_idx]
+            relative_val_size = val_ratio / (val_ratio + test_ratio)
+            val_idx, test_idx = sk_train_test_split(
+                rest_idx, train_size=relative_val_size, stratify=rest_labels, random_state=seed
+            )
+            return train_idx, val_idx, test_idx
 
     rng = np.random.default_rng(seed)
     indices = rng.permutation(n)
@@ -274,6 +423,15 @@ def build_knn_edge_index(features: np.ndarray, k: int, symmetric: bool = True) -
 
     edge_index_t = torch.from_numpy(edge_index).long()
     edge_index_t = torch.unique(edge_index_t, dim=1)
+    # torch.unique(..., dim=1) sorts/deduplicates by internally transposing
+    # and transposing back, which returns a non-contiguous view (correct
+    # values, but non-standard strides). NeighborLoader's pure-Python
+    # fallback sampler tolerates this, but pyg_lib's compiled C++ sampler
+    # does a strict contiguity check and raises "Input should be
+    # contiguous" otherwise -- so this is required once pyg_lib is
+    # installed, and harmless (a cheap no-op if already contiguous)
+    # whether or not it is.
+    edge_index_t = edge_index_t.contiguous()
     return edge_index_t
 
 
@@ -291,6 +449,8 @@ class NeutrinoDataModule:
           file_pattern: "*.h5"
           hdf_key: null
           dropna: true
+          particle_type_regex: null   # e.g. "_(numuCC|nueCC|anue|atm_muon)_"
+          stratify_by_particle_type: true
           train_ratio: 0.7
           val_ratio: 0.15
           test_ratio: 0.15
@@ -316,19 +476,54 @@ class NeutrinoDataModule:
         yields bit-identical splits and scaling across ``train.py`` and
         ``evaluate.py`` runs, with zero extra state to manage. See "possible
         improvements" for when you would instead want to persist the scaler.
+    Note on per-file vs. combined data:
+        By default (``data_file=None``), this data module combines *every*
+        file matching ``data.file_pattern`` in ``data.data_dir`` into one
+        pooled train/val/test split -- appropriate only when combining
+        those files is physically justified. When it isn't (e.g. the files
+        are different detector runs or samples that shouldn't be
+        statistically mixed), pass a specific file via ``data_file`` to
+        scope this data module to exactly that one file; ``train.py``'s
+        default (``data.combine_files: false`` in ``base.yaml``) does this
+        automatically, training one independent model per file.
+    Note on particle_type provenance:
+        Every loaded event is tagged with a ``particle_type`` column
+        (see :func:`infer_particle_type`) derived from its source
+        filename, *before* any concatenation across files -- so even a
+        pooled dataset never loses track of which file each event came
+        from. This column is metadata, never a model input (it's kept out
+        of :data:`FEATURE_COLUMNS`), but is used, when
+        ``data.stratify_by_particle_type`` is enabled (default), to
+        stratify the train/val/test split so each sample type keeps its
+        overall proportion in every split -- see
+        :func:`train_val_test_split`. It's exposed on the instance via
+        :attr:`particle_type` after :meth:`setup`.
     """
 
-    def __init__(self, config: Dict[str, Any]) -> None:
+    def __init__(self, config: Dict[str, Any], data_file: Optional[PathLike] = None) -> None:
         self.config = config
         self.data_cfg: Dict[str, Any] = config.get("data", {})
         self.graph_cfg: Dict[str, Any] = config.get("graph", {})
         self.seed: int = config.get("seed", 42)
+        self.data_file: Optional[Path] = Path(data_file) if data_file is not None else None
 
         self.scaler: Optional[FeatureScaler] = None
         self._splits: Dict[str, np.ndarray] = {}
         self._X: Optional[np.ndarray] = None
         self._y: Optional[np.ndarray] = None
+        self._particle_type: Optional[np.ndarray] = None
         self._is_setup: bool = False
+
+    @property
+    def particle_type(self) -> np.ndarray:
+        """Per-event ``particle_type`` labels, aligned with rows of ``X``/``y``.
+
+        Populated by :meth:`setup`. Useful for tracing predictions/errors
+        back to their source file, e.g. breaking down angular error by
+        sample type in a custom analysis script.
+        """
+        self._check_setup()
+        return self._particle_type
 
     @property
     def input_dim(self) -> int:
@@ -353,11 +548,16 @@ class NeutrinoDataModule:
         if self._is_setup:
             return
 
-        data_dir = self.data_cfg.get("data_dir", "data/")
-        pattern = self.data_cfg.get("file_pattern", "*.h5")
         hdf_key = self.data_cfg.get("hdf_key", None)
+        particle_type_regex = self.data_cfg.get("particle_type_regex", None)
 
-        df = load_h5_files(data_dir, pattern=pattern, key=hdf_key)
+        if self.data_file is not None:
+            df = load_single_h5_file(self.data_file, key=hdf_key, particle_type_regex=particle_type_regex)
+            logger.info(f"NeutrinoDataModule scoped to a single file: {self.data_file.name}")
+        else:
+            data_dir = self.data_cfg.get("data_dir", "data/")
+            pattern = self.data_cfg.get("file_pattern", "*.h5")
+            df = load_h5_files(data_dir, pattern=pattern, key=hdf_key, particle_type_regex=particle_type_regex)
 
         required_cols = FEATURE_COLUMNS + TARGET_COLUMNS
         missing = [c for c in required_cols if c not in df.columns]
@@ -373,21 +573,33 @@ class NeutrinoDataModule:
 
         X = df[FEATURE_COLUMNS].to_numpy(dtype=np.float32)
         y = df[TARGET_COLUMNS].to_numpy(dtype=np.float32)
+        particle_type = df[PARTICLE_TYPE_COLUMN].to_numpy()
         n = len(df)
 
         train_ratio = self.data_cfg.get("train_ratio", 0.7)
         val_ratio = self.data_cfg.get("val_ratio", 0.15)
         test_ratio = self.data_cfg.get("test_ratio", 0.15)
+        stratify = self.data_cfg.get("stratify_by_particle_type", True)
 
         train_idx, val_idx, test_idx = train_val_test_split(
-            n, train_ratio, val_ratio, test_ratio, seed=self.seed
+            n,
+            train_ratio,
+            val_ratio,
+            test_ratio,
+            seed=self.seed,
+            stratify_labels=particle_type if stratify else None,
         )
         self._splits = {"train": train_idx, "val": val_idx, "test": test_idx}
 
         self.scaler = FeatureScaler.fit(X[train_idx])
         self._X = self.scaler.transform(X)
         self._y = y
+        self._particle_type = particle_type
         self._is_setup = True
+
+        for split_name, idx in self._splits.items():
+            split_counts = pd.Series(particle_type[idx]).value_counts().to_dict()
+            logger.info(f"particle_type distribution [{split_name}]: {split_counts}")
 
         logger.info(
             f"NeutrinoDataModule ready: {n} events total "

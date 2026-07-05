@@ -27,6 +27,7 @@ Contents
 from __future__ import annotations
 
 import copy
+import itertools
 import logging
 import os
 import random
@@ -34,7 +35,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
@@ -278,6 +279,91 @@ def apply_overrides(config: Dict[str, Any], overrides: List[str]) -> Dict[str, A
         value = yaml.safe_load(raw_value)
         set_by_dotted_path(cfg, dotted_key.strip(), value)
     return cfg
+
+
+def expand_config_grid(
+    config: Dict[str, Any],
+    sections: Optional[List[str]] = None,
+    exclude_keys: Optional[Dict[str, List[str]]] = None,
+) -> List[Dict[str, Any]]:
+    """Expand list-valued keys across one or more config sections into a full grid.
+
+    Lets a single config file double as an inline hyperparameter grid:
+    instead of a single value, any top-level key within any section in
+    ``sections`` (e.g. ``model.num_layers``, ``model.activation``,
+    ``train.lr``, ``train.optimizer``) may be given as a YAML list of
+    candidate values, and this function expands that into one concrete
+    config per combination -- the Cartesian product across *every*
+    list-valued key found, across *all* scanned sections at once::
+
+        model:
+          name: mlp
+          hidden_dim: 256
+          num_layers: [4, 8, 16]
+          activation: [relu, gelu]
+        train:
+          lr: [0.01, 0.001, 0.0001]
+
+    expands to 3 x 2 x 3 = 18 concrete configs, each with one fixed
+    ``num_layers``, ``activation``, and ``lr``. Nested dicts (e.g.
+    ``train.scheduler``) are never treated as sweep candidates -- only keys
+    whose *value* is itself a plain list are expanded.
+
+    Each returned config also gets a ``run_tag`` describing which
+    combination it is (e.g. ``"num_layers4_activationrelu_lr0.001"``),
+    appended to any existing ``run_tag``, so ``utils.build_run_name`` gives
+    every combination a distinct, self-describing run directory automatically.
+
+    Args:
+        config: The effective (merged) experiment configuration.
+        sections: Which top-level config sections to scan for list-valued
+            keys. Defaults to ``["model", "train"]``.
+        exclude_keys: Per-section keys that must always be treated as a
+            single scalar value even if given as a list, e.g.
+            ``{"model": ["name"]}`` (the architecture name -- different
+            architectures have different hyperparameter sets and can't be
+            swept together). Defaults to ``{"model": ["name"]}``.
+
+    Returns:
+        A list of full config dicts. If no list-valued keys are found in
+        any scanned section (the common case), returns a single-element
+        list containing an unmodified deep copy of ``config`` -- so this
+        function is always safe to call, even on a config with no sweep
+        intent at all.
+    """
+    sections = sections if sections is not None else ["model", "train"]
+    exclude_keys = exclude_keys if exclude_keys is not None else {"model": ["name"]}
+
+    grid_locations: List[Tuple[str, str]] = []  # (section, key) pairs
+    grid_values: List[List[Any]] = []
+
+    for section in sections:
+        section_cfg = config.get(section, {}) or {}
+        section_exclude = exclude_keys.get(section, [])
+        for key, value in section_cfg.items():
+            if key in section_exclude:
+                continue
+            if isinstance(value, list):
+                grid_locations.append((section, key))
+                grid_values.append(value)
+
+    if not grid_locations:
+        return [copy.deepcopy(config)]
+
+    combinations: List[Dict[str, Any]] = []
+    for values in itertools.product(*grid_values):
+        cfg = copy.deepcopy(config)
+        tag_parts = []
+        for (section, key), value in zip(grid_locations, values):
+            cfg[section][key] = value
+            tag_parts.append(f"{key}{value}")
+
+        tag = "_".join(tag_parts).replace(" ", "")
+        existing_tag = cfg.get("run_tag")
+        cfg["run_tag"] = f"{existing_tag}_{tag}" if existing_tag else tag
+
+        combinations.append(cfg)
+    return combinations
 
 
 # --------------------------------------------------------------------------- #

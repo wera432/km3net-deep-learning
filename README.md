@@ -30,16 +30,16 @@ function, and training procedure:
 
 | Model       | Config                    | Structure used                          |
 |-------------|----------------------------|-------------------------------------------|
-| MLP         | `configs/mlp.yaml`           | None — every event treated independently     |
-| GCN         | `configs/gcn.yaml`             | k-NN population graph over events               |
-| GraphSAGE   | `configs/graphsage.yaml`         | k-NN population graph over events                 |
-| GAT         | `configs/gat.yaml`                 | k-NN population graph over events (with attention)   |
+| MLP         | `config/mlp.yaml`           | None — every event treated independently     |
+| GCN         | `config/gcn.yaml`             | k-NN population graph over events               |
+| GraphSAGE   | `config/graphsage.yaml`         | k-NN population graph over events                 |
+| GAT         | `config/gat.yaml`                 | k-NN population graph over events (with attention)   |
 
 ## Project structure
 
 ```
 project/
-├── configs/
+├── config/
 │   ├── base.yaml         # Shared data / training procedure / loss / logging
 │   ├── mlp.yaml           # MLP architecture only
 │   ├── gcn.yaml             # GCN architecture only
@@ -98,10 +98,15 @@ pip install -r requirements.txt
 
 ```bash
 # Train each model (identical data/training procedure, different architecture)
-python train.py --model-config configs/mlp.yaml
-python train.py --model-config configs/gcn.yaml
-python train.py --model-config configs/graphsage.yaml
-python train.py --model-config configs/gat.yaml
+python train.py config/mlp.yaml
+python train.py config/gcn.yaml
+python train.py config/graphsage.yaml
+python train.py config/gat.yaml
+
+# Common flags: --epochs N (shortcut for train.epochs), --no-scheduler
+# (shortcut for train.scheduler.type=none), --seed N, --device cpu|cuda,
+# --resume <checkpoint.pt>. Anything else: --override dotted.key=value.
+python train.py config/mlp.yaml --epochs 30 --no-scheduler
 
 # Evaluate a trained model: generates PNG figures + metrics.json
 python evaluate.py --checkpoint checkpoints/gat_20260701-113045/best.pt
@@ -109,9 +114,13 @@ python evaluate.py --checkpoint checkpoints/gat_20260701-113045/best.pt
 # Compare all evaluated runs: table + comparison plots
 python compare.py
 
-# Monitor training live
+# Monitor training live -- train.py prints the exact command to use at the
+# end of every run (see "Viewing a grid in TensorBoard" below)
 tensorboard --logdir runs/
 ```
+
+`--base-config` defaults to `config/baseline.yaml` (this repo's actual base
+config), so it normally doesn't need to be passed explicitly.
 
 Every `train.py` run prints its exact `checkpoints/<run_name>/` path at the
 end, along with the ready-to-copy `evaluate.py` command for it.
@@ -139,16 +148,16 @@ as the MLP's plain `DataLoader`.
 
 ## Configuration system
 
-`configs/base.yaml` holds everything that must be identical across models
+`config/baseline.yaml` holds everything that must be identical across models
 for a fair comparison: data location/splitting, graph construction, batch
 size, optimizer, scheduler, epochs, early stopping, and loss function.
-Each `configs/{mlp,gcn,graphsage,gat}.yaml` overrides *only* the `model:`
+Each `config/{mlp,gcn,graphsage,gat}.yaml` overrides *only* the `model:`
 section (architecture name + hyperparameters). They're deep-merged at
 runtime:
 
 ```python
 from utils import load_experiment_config
-config = load_experiment_config("configs/base.yaml", "configs/gat.yaml")
+config = load_experiment_config("config/baseline.yaml", "config/gat.yaml")
 ```
 
 **Nothing is hardcoded in Python** — optimizer, learning rate, scheduler,
@@ -158,7 +167,7 @@ weight decay, and early-stopping patience all come from these YAML files.
 ### One-off overrides without editing YAML
 
 ```bash
-python train.py --model-config configs/gat.yaml \
+python train.py config/gat.yaml \
     --override train.lr=0.0005 \
     --override model.activation=relu \
     --override train.optimizer=sgd
@@ -171,7 +180,7 @@ mechanism `sweep.py` uses internally.
 
 To compare multiple optimizers, learning rates, activations (or any other
 config field) for a given architecture, define a grid in a sweep YAML
-file (see `configs/sweep.yaml`):
+file (see `config/sweep.yaml`):
 
 ```yaml
 sweep:
@@ -184,19 +193,55 @@ Then run:
 
 ```bash
 # Preview the planned runs first (no training executed)
-python sweep.py --model-config configs/gat.yaml --sweep-config configs/sweep.yaml --dry-run
+python sweep.py --model-config config/gat.yaml --sweep-config config/sweep.yaml --dry-run
 
 # Run the full grid, evaluating each combination automatically
-python sweep.py --model-config configs/gat.yaml --sweep-config configs/sweep.yaml --evaluate
+python sweep.py --model-config config/gat.yaml --sweep-config config/sweep.yaml --evaluate
 
 # Quick smoke test: only the first 3 combinations, with a short epoch budget
-python sweep.py --model-config configs/mlp.yaml --sweep-config configs/sweep.yaml \
+python sweep.py --model-config config/mlp.yaml --sweep-config config/sweep.yaml \
     --max-runs 3 --override train.epochs=5 --evaluate
 ```
 
 Each combination trains in its own isolated subprocess and gets a
 self-describing run name (e.g. `gat_optimizeradamw_lr0.001_activationelu_...`).
 Once the sweep finishes:
+
+> **Note:** `sweep.py` is documented here as the intended way to run grids
+> spanning *multiple* architectures via isolated subprocesses, but isn't
+> yet present in this repo. For grids within a single architecture (same
+> `model.name`), use the inline list syntax in a model config file (see
+> above) with `train.py` directly — no separate script needed.
+
+### Viewing a grid in TensorBoard
+
+Whether the grid comes from an inline list in a model config file (see
+above) or from `sweep.py`, every combination trained by **one invocation**
+logs to TensorBoard under **one shared group directory**,
+`runs/<model>_<invocation_timestamp>/<combo_run_name>/`, instead of a
+separate top-level `runs/` entry per combination. At the end of training,
+the console prints the exact command, e.g.:
+
+```bash
+tensorboard --logdir runs/mlp_20260703-193726
+```
+
+That single TensorBoard session gives two complementary views of the same
+grid:
+
+- **Scalars tab** — every combination's train/val loss, cosine similarity,
+  and learning-rate curves overlaid on the same charts, with a sidebar
+  checklist to toggle individual combinations on/off.
+- **HParams tab** — one row per combination, with its hyperparameters
+  (learning rate, optimizer, `num_layers`, `activation`, ...) and final
+  metrics (`hparam/best_val_loss`, `hparam/final_val_cosine_similarity`,
+  ...) side by side in a sortable table, plus a parallel-coordinates plot
+  — the fastest way to spot which configuration actually won.
+
+For a single (non-grid) run, logs go directly to `runs/<run_name>/` as
+before, and the same `tensorboard --logdir ...` command is printed.
+Checkpoints are **not** grouped this way — they stay flat under
+`checkpoints/<run_name>/` so `evaluate.py`/`compare.py` are unaffected.
 
 ```bash
 python compare.py                    # every combination
@@ -272,8 +317,8 @@ class GIN(DirectionRegressor):
 MODEL_REGISTRY["gin"] = GIN
 ```
 
-Then add `configs/gin.yaml` with a `model:` section, and
-`python train.py --model-config configs/gin.yaml` works immediately —
+Then add `config/gin.yaml` with a `model:` section, and
+`python train.py config/gin.yaml` works immediately —
 `dataset.py`, `trainer.py`, `evaluate.py`, and `compare.py` require no changes.
 
 **Add a new loss function:** subclass `losses.DirectionLoss`, implement

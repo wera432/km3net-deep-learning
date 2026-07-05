@@ -11,7 +11,10 @@
 
 model:
   name: mlp
-  hidden_dim: 256      # Width of each hidden layer
-  num_layers: 4           # Number of [Linear -> Activation -> Dropout] blocks
-  dropout: 0.2                # Dropout probability
-  activation: relu               # relu | leaky_relu | elu | gelu | tanh | selu
+  hidden_dim: 256
+  num_layers: 4
+  dropout: 0.2
+  activation: leaky_relu
+
+train:
+  lr: 0.001

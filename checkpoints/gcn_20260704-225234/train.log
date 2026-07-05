@@ -1,0 +1,82 @@
+[2026-07-04 22:52:34] INFO - gcn_20260704-225234 - [1/1] Run name: gcn_20260704-225234
+[2026-07-04 22:52:34] INFO - gcn_20260704-225234 - [1/1] Model: GCN | requires_graph=True | trainable_params=137,219 | model_config={'name': 'gcn', 'hidden_dim': 256, 'num_layers': 3, 'dropout': 0.1, 'activation': 'leaky_relu'}
+[2026-07-04 22:54:40] INFO - gcn_20260704-225234 - Trainer ready: model=GCN (137,219 trainable params), device=cuda, graph_model=True
+[2026-07-04 22:54:40] INFO - gcn_20260704-225234 - Starting training: epochs=75, start_epoch=0, optimizer=AdamW, scheduler=plateau
+[2026-07-04 22:55:21] INFO - gcn_20260704-225234 - Epoch 1/75 | train_loss=0.24288 val_loss=0.24619 | train_cos=0.8126 val_cos=0.8127 | lr=1.00e-03 | time=41.4s
+[2026-07-04 22:56:02] INFO - gcn_20260704-225234 - Epoch 2/75 | train_loss=0.23092 val_loss=0.24226 | train_cos=0.8214 val_cos=0.8152 | lr=1.00e-03 | time=41.3s
+[2026-07-04 22:56:44] INFO - gcn_20260704-225234 - Epoch 3/75 | train_loss=0.22970 val_loss=0.24385 | train_cos=0.8224 val_cos=0.8140 | lr=1.00e-03 | time=41.8s
+[2026-07-04 22:57:26] INFO - gcn_20260704-225234 - Epoch 4/75 | train_loss=0.22841 val_loss=0.24009 | train_cos=0.8234 val_cos=0.8166 | lr=1.00e-03 | time=41.8s
+[2026-07-04 22:58:08] INFO - gcn_20260704-225234 - Epoch 5/75 | train_loss=0.22780 val_loss=0.24005 | train_cos=0.8238 val_cos=0.8164 | lr=1.00e-03 | time=41.8s
+[2026-07-04 22:58:50] INFO - gcn_20260704-225234 - Epoch 6/75 | train_loss=0.22791 val_loss=0.23949 | train_cos=0.8238 val_cos=0.8176 | lr=1.00e-03 | time=41.7s
+[2026-07-04 22:59:31] INFO - gcn_20260704-225234 - Epoch 7/75 | train_loss=0.22752 val_loss=0.24114 | train_cos=0.8240 val_cos=0.8164 | lr=1.00e-03 | time=41.8s
+[2026-07-04 23:00:13] INFO - gcn_20260704-225234 - Epoch 8/75 | train_loss=0.22625 val_loss=0.23945 | train_cos=0.8249 val_cos=0.8178 | lr=1.00e-03 | time=41.7s
+[2026-07-04 23:00:55] INFO - gcn_20260704-225234 - Epoch 9/75 | train_loss=0.22654 val_loss=0.23858 | train_cos=0.8246 val_cos=0.8180 | lr=1.00e-03 | time=41.6s
+[2026-07-04 23:01:37] INFO - gcn_20260704-225234 - Epoch 10/75 | train_loss=0.22569 val_loss=0.23925 | train_cos=0.8252 val_cos=0.8172 | lr=1.00e-03 | time=41.7s
+[2026-07-04 23:02:19] INFO - gcn_20260704-225234 - Epoch 11/75 | train_loss=0.22552 val_loss=0.23820 | train_cos=0.8254 val_cos=0.8185 | lr=1.00e-03 | time=42.0s
+[2026-07-04 23:03:01] INFO - gcn_20260704-225234 - Epoch 12/75 | train_loss=0.22508 val_loss=0.23815 | train_cos=0.8257 val_cos=0.8184 | lr=1.00e-03 | time=41.8s
+[2026-07-04 23:03:42] INFO - gcn_20260704-225234 - Epoch 13/75 | train_loss=0.22545 val_loss=0.23792 | train_cos=0.8254 val_cos=0.8183 | lr=1.00e-03 | time=41.7s
+[2026-07-04 23:04:24] INFO - gcn_20260704-225234 - Epoch 14/75 | train_loss=0.22449 val_loss=0.23786 | train_cos=0.8261 val_cos=0.8184 | lr=1.00e-03 | time=41.7s
+[2026-07-04 23:05:06] INFO - gcn_20260704-225234 - Epoch 15/75 | train_loss=0.22459 val_loss=0.23647 | train_cos=0.8260 val_cos=0.8187 | lr=1.00e-03 | time=42.1s
+[2026-07-04 23:05:48] INFO - gcn_20260704-225234 - Epoch 16/75 | train_loss=0.22393 val_loss=0.23758 | train_cos=0.8265 val_cos=0.8187 | lr=1.00e-03 | time=42.0s
+[2026-07-04 23:06:30] INFO - gcn_20260704-225234 - Epoch 17/75 | train_loss=0.22382 val_loss=0.23849 | train_cos=0.8265 val_cos=0.8173 | lr=1.00e-03 | time=41.8s
+[2026-07-04 23:07:12] INFO - gcn_20260704-225234 - Epoch 18/75 | train_loss=0.22368 val_loss=0.23835 | train_cos=0.8267 val_cos=0.8175 | lr=1.00e-03 | time=42.2s
+[2026-07-04 23:07:54] INFO - gcn_20260704-225234 - Epoch 19/75 | train_loss=0.22322 val_loss=0.23656 | train_cos=0.8270 val_cos=0.8187 | lr=1.00e-03 | time=41.9s
+[2026-07-04 23:08:36] INFO - gcn_20260704-225234 - Epoch 20/75 | train_loss=0.22283 val_loss=0.23707 | train_cos=0.8273 val_cos=0.8184 | lr=1.00e-03 | time=41.5s
+[2026-07-04 23:09:17] INFO - gcn_20260704-225234 - Epoch 21/75 | train_loss=0.22297 val_loss=0.23603 | train_cos=0.8272 val_cos=0.8191 | lr=1.00e-03 | time=41.6s
+[2026-07-04 23:09:59] INFO - gcn_20260704-225234 - Epoch 22/75 | train_loss=0.22224 val_loss=0.23612 | train_cos=0.8278 val_cos=0.8190 | lr=1.00e-03 | time=41.6s
+[2026-07-04 23:10:41] INFO - gcn_20260704-225234 - Epoch 23/75 | train_loss=0.22213 val_loss=0.23685 | train_cos=0.8278 val_cos=0.8183 | lr=1.00e-03 | time=41.4s
+[2026-07-04 23:11:22] INFO - gcn_20260704-225234 - Epoch 24/75 | train_loss=0.22204 val_loss=0.23702 | train_cos=0.8280 val_cos=0.8185 | lr=1.00e-03 | time=41.7s
+[2026-07-04 23:12:04] INFO - gcn_20260704-225234 - Epoch 25/75 | train_loss=0.22149 val_loss=0.23640 | train_cos=0.8284 val_cos=0.8191 | lr=1.00e-03 | time=41.5s
+[2026-07-04 23:12:46] INFO - gcn_20260704-225234 - Epoch 26/75 | train_loss=0.22101 val_loss=0.23604 | train_cos=0.8288 val_cos=0.8191 | lr=1.00e-03 | time=41.7s
+[2026-07-04 23:13:27] INFO - gcn_20260704-225234 - Epoch 27/75 | train_loss=0.22100 val_loss=0.23669 | train_cos=0.8288 val_cos=0.8184 | lr=1.00e-03 | time=41.5s
+[2026-07-04 23:14:09] INFO - gcn_20260704-225234 - Epoch 28/75 | train_loss=0.22118 val_loss=0.23532 | train_cos=0.8286 val_cos=0.8196 | lr=1.00e-03 | time=41.7s
+[2026-07-04 23:14:50] INFO - gcn_20260704-225234 - Epoch 29/75 | train_loss=0.22051 val_loss=0.23634 | train_cos=0.8292 val_cos=0.8190 | lr=1.00e-03 | time=41.6s
+[2026-07-04 23:15:32] INFO - gcn_20260704-225234 - Epoch 30/75 | train_loss=0.22051 val_loss=0.23622 | train_cos=0.8291 val_cos=0.8192 | lr=1.00e-03 | time=41.6s
+[2026-07-04 23:16:13] INFO - gcn_20260704-225234 - Epoch 31/75 | train_loss=0.22009 val_loss=0.23637 | train_cos=0.8295 val_cos=0.8188 | lr=1.00e-03 | time=41.4s
+[2026-07-04 23:16:55] INFO - gcn_20260704-225234 - Epoch 32/75 | train_loss=0.22006 val_loss=0.23661 | train_cos=0.8295 val_cos=0.8186 | lr=1.00e-03 | time=41.7s
+[2026-07-04 23:17:37] INFO - gcn_20260704-225234 - Epoch 33/75 | train_loss=0.21968 val_loss=0.23575 | train_cos=0.8299 val_cos=0.8193 | lr=1.00e-03 | time=41.7s
+[2026-07-04 23:18:19] INFO - gcn_20260704-225234 - Epoch 34/75 | train_loss=0.21969 val_loss=0.23531 | train_cos=0.8299 val_cos=0.8192 | lr=1.00e-03 | time=41.7s
+[2026-07-04 23:19:01] INFO - gcn_20260704-225234 - Epoch 35/75 | train_loss=0.21944 val_loss=0.23620 | train_cos=0.8300 val_cos=0.8189 | lr=1.00e-03 | time=41.9s
+[2026-07-04 23:19:42] INFO - gcn_20260704-225234 - Epoch 36/75 | train_loss=0.21933 val_loss=0.23567 | train_cos=0.8302 val_cos=0.8192 | lr=1.00e-03 | time=41.8s
+[2026-07-04 23:20:24] INFO - gcn_20260704-225234 - Epoch 37/75 | train_loss=0.21922 val_loss=0.23641 | train_cos=0.8302 val_cos=0.8188 | lr=1.00e-03 | time=41.8s
+[2026-07-04 23:21:06] INFO - gcn_20260704-225234 - Epoch 38/75 | train_loss=0.21606 val_loss=0.23494 | train_cos=0.8327 val_cos=0.8196 | lr=5.00e-04 | time=42.0s
+[2026-07-04 23:21:48] INFO - gcn_20260704-225234 - Epoch 39/75 | train_loss=0.21533 val_loss=0.23376 | train_cos=0.8332 val_cos=0.8203 | lr=5.00e-04 | time=41.7s
+[2026-07-04 23:22:30] INFO - gcn_20260704-225234 - Epoch 40/75 | train_loss=0.21495 val_loss=0.23448 | train_cos=0.8336 val_cos=0.8198 | lr=5.00e-04 | time=41.6s
+[2026-07-04 23:23:11] INFO - gcn_20260704-225234 - Epoch 41/75 | train_loss=0.21468 val_loss=0.23460 | train_cos=0.8338 val_cos=0.8197 | lr=5.00e-04 | time=41.6s
+[2026-07-04 23:23:53] INFO - gcn_20260704-225234 - Epoch 42/75 | train_loss=0.21448 val_loss=0.23478 | train_cos=0.8339 val_cos=0.8196 | lr=5.00e-04 | time=41.6s
+[2026-07-04 23:24:35] INFO - gcn_20260704-225234 - Epoch 43/75 | train_loss=0.21393 val_loss=0.23501 | train_cos=0.8344 val_cos=0.8193 | lr=5.00e-04 | time=41.6s
+[2026-07-04 23:25:16] INFO - gcn_20260704-225234 - Epoch 44/75 | train_loss=0.21423 val_loss=0.23441 | train_cos=0.8342 val_cos=0.8199 | lr=5.00e-04 | time=41.7s
+[2026-07-04 23:25:58] INFO - gcn_20260704-225234 - Epoch 45/75 | train_loss=0.21374 val_loss=0.23502 | train_cos=0.8346 val_cos=0.8195 | lr=5.00e-04 | time=41.7s
+[2026-07-04 23:26:40] INFO - gcn_20260704-225234 - Epoch 46/75 | train_loss=0.21341 val_loss=0.23493 | train_cos=0.8349 val_cos=0.8195 | lr=5.00e-04 | time=41.8s
+[2026-07-04 23:27:21] INFO - gcn_20260704-225234 - Epoch 47/75 | train_loss=0.21327 val_loss=0.23415 | train_cos=0.8350 val_cos=0.8199 | lr=5.00e-04 | time=41.6s
+[2026-07-04 23:28:03] INFO - gcn_20260704-225234 - Epoch 48/75 | train_loss=0.21326 val_loss=0.23446 | train_cos=0.8350 val_cos=0.8196 | lr=5.00e-04 | time=41.6s
+[2026-07-04 23:28:45] INFO - gcn_20260704-225234 - Epoch 49/75 | train_loss=0.21091 val_loss=0.23368 | train_cos=0.8369 val_cos=0.8203 | lr=2.50e-04 | time=41.7s
+[2026-07-04 23:29:26] INFO - gcn_20260704-225234 - Epoch 50/75 | train_loss=0.21052 val_loss=0.23376 | train_cos=0.8372 val_cos=0.8202 | lr=2.50e-04 | time=41.5s
+[2026-07-04 23:30:08] INFO - gcn_20260704-225234 - Epoch 51/75 | train_loss=0.21058 val_loss=0.23392 | train_cos=0.8372 val_cos=0.8199 | lr=2.50e-04 | time=41.5s
+[2026-07-04 23:30:49] INFO - gcn_20260704-225234 - Epoch 52/75 | train_loss=0.21015 val_loss=0.23413 | train_cos=0.8375 val_cos=0.8200 | lr=2.50e-04 | time=41.6s
+[2026-07-04 23:31:31] INFO - gcn_20260704-225234 - Epoch 53/75 | train_loss=0.20984 val_loss=0.23428 | train_cos=0.8378 val_cos=0.8198 | lr=2.50e-04 | time=41.4s
+[2026-07-04 23:32:13] INFO - gcn_20260704-225234 - Epoch 54/75 | train_loss=0.20982 val_loss=0.23417 | train_cos=0.8378 val_cos=0.8199 | lr=2.50e-04 | time=41.5s
+[2026-07-04 23:32:54] INFO - gcn_20260704-225234 - Epoch 55/75 | train_loss=0.20991 val_loss=0.23380 | train_cos=0.8377 val_cos=0.8202 | lr=2.50e-04 | time=41.5s
+[2026-07-04 23:33:36] INFO - gcn_20260704-225234 - Epoch 56/75 | train_loss=0.20952 val_loss=0.23356 | train_cos=0.8381 val_cos=0.8203 | lr=2.50e-04 | time=41.8s
+[2026-07-04 23:34:17] INFO - gcn_20260704-225234 - Epoch 57/75 | train_loss=0.20930 val_loss=0.23386 | train_cos=0.8383 val_cos=0.8200 | lr=2.50e-04 | time=41.6s
+[2026-07-04 23:34:59] INFO - gcn_20260704-225234 - Epoch 58/75 | train_loss=0.20926 val_loss=0.23417 | train_cos=0.8383 val_cos=0.8199 | lr=2.50e-04 | time=41.8s
+[2026-07-04 23:35:41] INFO - gcn_20260704-225234 - Epoch 59/75 | train_loss=0.20889 val_loss=0.23428 | train_cos=0.8386 val_cos=0.8197 | lr=2.50e-04 | time=41.9s
+[2026-07-04 23:36:23] INFO - gcn_20260704-225234 - Epoch 60/75 | train_loss=0.20915 val_loss=0.23436 | train_cos=0.8384 val_cos=0.8196 | lr=2.50e-04 | time=41.8s
+[2026-07-04 23:37:05] INFO - gcn_20260704-225234 - Epoch 61/75 | train_loss=0.20889 val_loss=0.23398 | train_cos=0.8386 val_cos=0.8197 | lr=2.50e-04 | time=42.0s
+[2026-07-04 23:37:47] INFO - gcn_20260704-225234 - Epoch 62/75 | train_loss=0.20869 val_loss=0.23387 | train_cos=0.8388 val_cos=0.8201 | lr=2.50e-04 | time=41.6s
+[2026-07-04 23:38:28] INFO - gcn_20260704-225234 - Epoch 63/75 | train_loss=0.20866 val_loss=0.23449 | train_cos=0.8388 val_cos=0.8195 | lr=2.50e-04 | time=41.7s
+[2026-07-04 23:39:10] INFO - gcn_20260704-225234 - Epoch 64/75 | train_loss=0.20825 val_loss=0.23469 | train_cos=0.8392 val_cos=0.8195 | lr=2.50e-04 | time=41.6s
+[2026-07-04 23:39:51] INFO - gcn_20260704-225234 - Epoch 65/75 | train_loss=0.20813 val_loss=0.23425 | train_cos=0.8393 val_cos=0.8195 | lr=2.50e-04 | time=41.4s
+[2026-07-04 23:40:33] INFO - gcn_20260704-225234 - Epoch 66/75 | train_loss=0.20681 val_loss=0.23397 | train_cos=0.8404 val_cos=0.8198 | lr=1.25e-04 | time=41.4s
+[2026-07-04 23:41:14] INFO - gcn_20260704-225234 - Epoch 67/75 | train_loss=0.20675 val_loss=0.23416 | train_cos=0.8404 val_cos=0.8198 | lr=1.25e-04 | time=41.5s
+[2026-07-04 23:41:56] INFO - gcn_20260704-225234 - Epoch 68/75 | train_loss=0.20644 val_loss=0.23385 | train_cos=0.8407 val_cos=0.8198 | lr=1.25e-04 | time=41.3s
+[2026-07-04 23:42:37] INFO - gcn_20260704-225234 - Epoch 69/75 | train_loss=0.20637 val_loss=0.23425 | train_cos=0.8408 val_cos=0.8196 | lr=1.25e-04 | time=41.4s
+[2026-07-04 23:43:18] INFO - gcn_20260704-225234 - Epoch 70/75 | train_loss=0.20629 val_loss=0.23431 | train_cos=0.8408 val_cos=0.8197 | lr=1.25e-04 | time=41.3s
+[2026-07-04 23:44:00] INFO - gcn_20260704-225234 - Epoch 71/75 | train_loss=0.20635 val_loss=0.23454 | train_cos=0.8408 val_cos=0.8195 | lr=1.25e-04 | time=41.4s
+[2026-07-04 23:44:41] INFO - gcn_20260704-225234 - Epoch 72/75 | train_loss=0.20612 val_loss=0.23376 | train_cos=0.8410 val_cos=0.8200 | lr=1.25e-04 | time=41.5s
+[2026-07-04 23:45:22] INFO - gcn_20260704-225234 - Epoch 73/75 | train_loss=0.20619 val_loss=0.23461 | train_cos=0.8409 val_cos=0.8193 | lr=1.25e-04 | time=41.1s
+[2026-07-04 23:46:04] INFO - gcn_20260704-225234 - Epoch 74/75 | train_loss=0.20591 val_loss=0.23435 | train_cos=0.8412 val_cos=0.8196 | lr=1.25e-04 | time=41.3s
+[2026-07-04 23:46:45] INFO - gcn_20260704-225234 - Epoch 75/75 | train_loss=0.20520 val_loss=0.23405 | train_cos=0.8417 val_cos=0.8196 | lr=6.25e-05 | time=41.6s
+[2026-07-04 23:46:45] INFO - gcn_20260704-225234 - [1/1] Training complete. Best val loss: 0.23356 after 75 epochs.
+[2026-07-04 23:46:45] INFO - gcn_20260704-225234 - [1/1] Checkpoints: checkpoints/gcn_20260704-225234
+[2026-07-04 23:46:45] INFO - gcn_20260704-225234 - [1/1] Next: python evaluate.py --checkpoint checkpoints/gcn_20260704-225234/best.pt
